@@ -19,7 +19,7 @@
 using namespace trantor;
 
 // Force OpenSSL to initialize before main() is called
-static bool sslInitFlag = []() {
+[[maybe_unused]] static bool sslInitFlag = []() {
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
     SSL_library_init();
     OpenSSL_add_all_algorithms();

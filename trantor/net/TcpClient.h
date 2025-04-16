@@ -249,7 +249,7 @@ class TRANTOR_EXPORT TcpClient : NonCopyable,
     std::atomic_bool connect_;  // atomic
     // always in loop thread
     mutable std::mutex mutex_;
-    TcpConnectionPtr connection_;  // @GuardedBy mutex_
+    std::atomic<TcpConnectionPtr> connection_;  // @GuardedBy mutex_
     TLSPolicyPtr tlsPolicyPtr_;
     SSLContextPtr sslContextPtr_;
     bool validateCert_{false};

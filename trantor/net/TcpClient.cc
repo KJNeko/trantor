@@ -74,12 +74,12 @@ TcpClient::~TcpClient()
 {
     LOG_TRACE << "TcpClient::~TcpClient[" << name_ << "] - connector ";
     std::lock_guard<std::mutex> lock(mutex_);
-    if (connection_ == nullptr)
+    if (connection_.load() == nullptr)
     {
         connector_->stop();
         return;
     }
-    assert(loop_ == connection_->getLoop());
+    assert(loop_ == connection_.load()->getLoop());
     auto conn =
         std::atomic_load_explicit(&connection_, std::memory_order_relaxed);
     loop_->runInLoop([conn = std::move(conn)]() {
@@ -88,7 +88,7 @@ TcpClient::~TcpClient()
                 [connPtr] { connPtr->connectDestroyed(); });
         });
     });
-    connection_->forceClose();
+    connection_.load()->forceClose();
 }
 
 void TcpClient::connect()
@@ -123,9 +123,9 @@ void TcpClient::disconnect()
 
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (connection_)
+        if (auto connection_ptr = connection_.load(); connection_ptr)
         {
-            connection_->shutdown();
+            connection_ptr->shutdown();
         }
     }
 }
@@ -207,8 +207,8 @@ void TcpClient::removeConnection(const TcpConnectionPtr &conn)
 
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        assert(connection_ == conn);
-        connection_.reset();
+        assert(connection_.load() == conn);
+        connection_.load().reset();
     }
 
     loop_->queueInLoop([conn]() { conn->connectDestroyed(); });
