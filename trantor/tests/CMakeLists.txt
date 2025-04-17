@@ -56,7 +56,7 @@ if(HAVE_SPDLOG)
   list(APPEND targets_list spdlogger_test)
 endif(HAVE_SPDLOG)
 
-set_property(TARGET ${targets_list} PROPERTY CXX_STANDARD 14)
+set_property(TARGET ${targets_list} PROPERTY CXX_STANDARD 23)
 set_property(TARGET ${targets_list} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET ${targets_list} PROPERTY CXX_EXTENSIONS OFF)
 
